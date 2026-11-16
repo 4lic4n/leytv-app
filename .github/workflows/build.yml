@@ -2,7 +2,7 @@ name: Build Unsigned iOS IPA
 on:
   workflow_dispatch:
   push:
-    branches: [ ana, main, master ]
+    branches: [ main, master ]
 
 jobs:
   build:
@@ -31,14 +31,7 @@ jobs:
       - name: Build Unsigned App
         run: |
           cd ios
-      # Doğru .xcworkspace klasörünü buluyoruz
-      WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
-      SCHEME=$(xcodebuild -workspace "$WORKSPACE" -list | awk '/Schemes:/{getline; print $1}')
-      echo "Building workspace: $WORKSPACE with scheme: $SCHEME"
-      xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" archive -archivePath build/App.xcarchive- name: Build Unsigned App
-        run: |
-          cd ios
-          WORKSPACE=$(ls *.xcworkspace | head -1)
+          WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
           SCHEME=$(xcodebuild -workspace "$WORKSPACE" -list | awk '/Schemes:/{getline; print $1}')
           echo "Building workspace: $WORKSPACE with scheme: $SCHEME"
           xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" archive -archivePath build/App.xcarchive
