@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "LeyTV App",
+    "slug": "leytv-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alican.leytv",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio",
+          "external-accessory",
+          "fetch"
+        ],
+        "NSLocalNetworkUsageDescription": "Yerel ağdaki IPTV ve medya sunucularına bağlanmak için gereklidir."
+      },
+      "entitlements": {
+        "com.apple.developer.carplay-audio": true,
+        "com.apple.developer.carplay-protocols": [
+          "com.apple.carplay"
+        ]
+      }
+    },
+    "plugins": [
+      "expo-video",
+      "expo-document-picker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6bedf3bd-4d6d-4247-a99d-4cf17ca2ab68"
+      }
+    }
+  }
+}
