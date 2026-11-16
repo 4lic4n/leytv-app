@@ -34,12 +34,14 @@ jobs:
           WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
           SCHEME=$(xcodebuild -workspace "$WORKSPACE" -list | awk '/Schemes:/{getline; print $1}')
           echo "Building workspace: $WORKSPACE with scheme: $SCHEME"
-          xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" archive -archivePath build/App.xcarchive
+          # Burada çıktı dizinini açıkça belirtiyoruz: SYMROOT ve OBJROOT
+          xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" SYMROOT="$(PWD)/build" OBJROOT="$(PWD)/build"
 
       - name: Package into IPA
         run: |
+          # Çıktı klasörü artık ios/build/Release-iphoneos olacak
           mkdir -p Payload
-          cp -r ios/build/App.xcarchive/Products/Applications/*.app Payload/
+          cp -r ios/build/Release-iphoneos/*.app Payload/
           zip -r LeyTV-Unsigned.ipa Payload
 
       - name: Upload IPA Artifact
