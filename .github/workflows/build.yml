@@ -34,13 +34,11 @@ jobs:
           WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
           SCHEME=$(xcodebuild -workspace "$WORKSPACE" -list | awk '/Schemes:/{getline; print $1}')
           echo "Building workspace: $WORKSPACE with scheme: $SCHEME"
-          # Çıktıyı mecburi olarak ./DerivedData klasörüne yönlendiriyoruz
           xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" -derivedDataPath ./DerivedData
 
       - name: Package into IPA
         run: |
           mkdir -p Payload
-          # .app dosyasını DerivedData içinde otomatik arayıp buluyoruz
           APP_PATH=$(find ios/DerivedData/Build/Products -name "*.app" -type d | head -n 1)
           echo "Uygulama yolu bulundu: $APP_PATH"
           cp -r "$APP_PATH" Payload/
