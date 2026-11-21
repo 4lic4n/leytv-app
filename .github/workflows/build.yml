@@ -35,7 +35,7 @@ jobs:
           cd ios
           WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
           SCHEME="${WORKSPACE%.xcworkspace}"
-          echo "Derlenen Workspace: $WORKSPACE \vert{} Scheme:$SCHEME"
+          echo "Derlenen Workspace: $WORKSPACE - Scheme: $SCHEME"
           xcodebuild -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
@@ -46,4 +46,15 @@ jobs:
             CODE_SIGN_IDENTITY=""
 
       - name: Package into IPA
-        run
+        run: |
+          mkdir -p Payload
+          APP_PATH=$(find ios/build/Build/Products/Release-iphoneos -maxdepth 1 -name "*.app" | head -n 1)
+          echo "Uygulama yolu bulundu: $APP_PATH"
+          cp -r "$APP_PATH" Payload/
+          zip -r leytv-app.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: leytv-app-ipa
+          path: leytv-app.ipa
