@@ -1,13 +1,15 @@
 name: Build Unsigned iOS IPA
+
 on:
-  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-ios:
     name: Build iOS
     runs-on: macos-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -21,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Expo Prebuild
-        run: npx expo prebuild --platform ios --clean
+        run: npx expo prebuild --platform ios --clean --no-install
 
       - name: Install CocoaPods
         run: |
@@ -32,20 +34,16 @@ jobs:
         run: |
           cd ios
           WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
-          SCHEME=$(xcodebuild -workspace "$WORKSPACE" -list | awk '/Schemes:/{getline; print $1}')
-          echo "Building workspace: $WORKSPACE with scheme: $SCHEME"
-          xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" -derivedDataPath ./DerivedData
+          SCHEME="${WORKSPACE%.xcworkspace}"
+          echo "Derlenen Workspace: $WORKSPACE \vert{} Scheme:$SCHEME"
+          xcodebuild -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
 
       - name: Package into IPA
-        run: |
-          mkdir -p Payload
-          APP_PATH=$(find ios/DerivedData/Build/Products/Release-iphoneos -maxdepth 1 -name "*.app" | head -n 1)
-          echo "Uygulama yolu bulundu: $APP_PATH"
-          cp -r "$APP_PATH" Payload/
-          zip -r leytv-app.ipa Payload
-
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: LeyTV-IPA
-          path: LeyTV-Unsigned.ipa
+        run
